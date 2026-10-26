@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zona Naskoen Pro - Kasir & HPP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-amber-50 text-gray-800 font-sans pb-20" x-data="naskoenApp()">
+
+    <!-- Header -->
+    <header class="bg-amber-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">🟡 Zona Naskoen Pro</h1>
+            <span class="text-xs bg-amber-700 px-2 py-1 rounded-full font-semibold">Online & Siap Jualan</span>
+        </div>
+    </header>
+
+    <!-- Navigasi Tab -->
+    <nav class="bg-white shadow-sm border-b border-amber-200 sticky top-14 z-40">
+        <div class="max-w-md mx-auto flex justify-around text-xs font-medium">
+            <button @click="tab = 'hpp'" :class="tab === 'hpp' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">🧮 HPP & Resep</button>
+            <button @click="tab = 'pos'" :class="tab === 'pos' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">🧾 Kasir (POS)</button>
+            <button @click="tab = 'stok'" :class="tab === 'stok' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">📦 Stok</button>
+            <button @click="tab = 'laporan'" :class="tab === 'laporan' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">📊 Laporan</button>
+        </div>
+    </nav>
+
+    <main class="max-w-md mx-auto p-4 space-y-4">
+
+        <!-- TAB 1: HPP & KONVERSI BAHAN -->
+        <div x-show="tab === 'hpp'" class="space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-amber-100">
+                <h2 class="font-bold text-amber-800 mb-2">💡 Konversi Bahan (Grosir ke Porsi)</h2>
+                <p class="text-xs text-gray-500 mb-3">Contoh: Beli Ayam Rp45.000 jadi 8 potong, Beras Rp15.000 jadi 15 porsi.</p>
+                
+                <div class="space-y-2">
+                    <input type="text" x-model="newBahan.nama" placeholder="Nama Bahan (Cth: Ayam / Beras)" class="w-full p-2 border rounded text-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" x-model.number="newBahan.hargaBeli" placeholder="Total Harga Beli (Rp)" class="p-2 border rounded text-sm">
+                        <input type="number" x-model.number="newBahan.jmlPorsi" placeholder="Hasil Jadi Porsi" class="p-2 border rounded text-sm">
+                    </div>
+                    <button @click="tambahBahan" class="w-full bg-amber-600 text-white py-2 rounded text-sm font-semibold hover:bg-amber-700">+ Tambah ke Resep</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-amber-100">
+                <h3 class="font-bold text-gray-700 text-sm mb-2">Daftar Komponen HPP Per Porsi</h3>
+                <div class="space-y-2">
+                    <template x-for="(item, index) in daftarBahan" :key="index">
+                        <div class="flex justify-between items-center bg-amber-50 p-2 rounded text-xs">
+                            <div>
+                                <span class="font-semibold block" x-text="item.nama"></span>
+                                <span class="text-gray-500" x-text="'Beli: Rp ' + item.hargaBeli.toLocaleString() + ' (Hasil ' + item.jmlPorsi + ' porsi)'"></span>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold text-amber-700 block" x-text="'Rp ' + Math.round(item.harga
