@@ -3,56 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zona Naskoen Pro - Kasir & HPP</title>
+    <title>Zona Naskoen Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-amber-50 text-gray-800 font-sans pb-20" x-data="naskoenApp()">
-
+<body class="bg-amber-50 text-slate-800" x-data="{ tab: 'pos' }">
     <!-- Header -->
-    <header class="bg-amber-600 text-white p-4 shadow-md sticky top-0 z-50">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">🟡 Zona Naskoen Pro</h1>
-            <span class="text-xs bg-amber-700 px-2 py-1 rounded-full font-semibold">Online & Siap Jualan</span>
+    <header class="bg-amber-600 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-lg font-bold flex items-center gap-2">
+                🟡 Zona Naskoen Pro
+            </h1>
+            <span class="bg-amber-700 text-xs px-2.5 py-1 rounded-full font-medium">Online & Siap Jualan</span>
         </div>
+        <!-- Navigasi Tab -->
+        <nav class="bg-amber-700 px-4 flex gap-4 overflow-x-auto text-sm">
+            <button @click="tab = 'hpp'" :class="tab === 'hpp' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">HPP & Resep</button>
+            <button @click="tab = 'pos'" :class="tab === 'pos' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">Kasir (POS)</button>
+            <button @click="tab = 'stok'" :class="tab === 'stok' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">Stok</button>
+            <button @click="tab = 'laporan'" :class="tab === 'laporan' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">Laporan</button>
+        </nav>
     </header>
 
-    <!-- Navigasi Tab -->
-    <nav class="bg-white shadow-sm border-b border-amber-200 sticky top-14 z-40">
-        <div class="max-w-md mx-auto flex justify-around text-xs font-medium">
-            <button @click="tab = 'hpp'" :class="tab === 'hpp' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">🧮 HPP & Resep</button>
-            <button @click="tab = 'pos'" :class="tab === 'pos' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">🧾 Kasir (POS)</button>
-            <button @click="tab = 'stok'" :class="tab === 'stok' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">📦 Stok</button>
-            <button @click="tab = 'laporan'" :class="tab === 'laporan' ? 'border-b-2 border-amber-600 text-amber-600 font-bold' : 'text-gray-500'" class="py-3 px-2">📊 Laporan</button>
+    <!-- Konten Utama -->
+    <main class="max-w-7xl mx-auto p-4">
+        <!-- HPP & Resep -->
+        <div x-show="tab === 'hpp'" class="bg-white p-4 rounded-xl shadow-sm">
+            <h2 class="text-lg font-bold text-amber-900 mb-2">Kalkulator HPP Nasi Kuning</h2>
+            <p class="text-sm text-gray-600">Hitung modal bahan baku dan rekomendasi harga jual porsi Nasi Kuning Lauk Royal.</p>
         </div>
-    </nav>
 
-    <main class="max-w-md mx-auto p-4 space-y-4">
+        <!-- Kasir POS -->
+        <div x-show="tab === 'pos'" class="bg-white p-4 rounded-xl shadow-sm">
+            <h2 class="text-lg font-bold text-amber-900 mb-2">Kasir (POS) - Zona Naskoen</h2>
+            <p class="text-sm text-gray-600">Catat pesanan pelanggan dengan cepat untuk dine-in atau online delivery.</p>
+        </div>
 
-        <!-- TAB 1: HPP & KONVERSI BAHAN -->
-        <div x-show="tab === 'hpp'" class="space-y-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-amber-100">
-                <h2 class="font-bold text-amber-800 mb-2">💡 Konversi Bahan (Grosir ke Porsi)</h2>
-                <p class="text-xs text-gray-500 mb-3">Contoh: Beli Ayam Rp45.000 jadi 8 potong, Beras Rp15.000 jadi 15 porsi.</p>
-                
-                <div class="space-y-2">
-                    <input type="text" x-model="newBahan.nama" placeholder="Nama Bahan (Cth: Ayam / Beras)" class="w-full p-2 border rounded text-sm">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" x-model.number="newBahan.hargaBeli" placeholder="Total Harga Beli (Rp)" class="p-2 border rounded text-sm">
-                        <input type="number" x-model.number="newBahan.jmlPorsi" placeholder="Hasil Jadi Porsi" class="p-2 border rounded text-sm">
-                    </div>
-                    <button @click="tambahBahan" class="w-full bg-amber-600 text-white py-2 rounded text-sm font-semibold hover:bg-amber-700">+ Tambah ke Resep</button>
-                </div>
-            </div>
+        <!-- Stok -->
+        <div x-show="tab === 'stok'" class="bg-white p-4 rounded-xl shadow-sm">
+            <h2 class="text-lg font-bold text-amber-900 mb-2">Manajemen Stok Bahan</h2>
+            <p class="text-sm text-gray-600">Pantau ketersediaan beras kuning, ayam, telur, dan bumbu.</p>
+        </div>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-amber-100">
-                <h3 class="font-bold text-gray-700 text-sm mb-2">Daftar Komponen HPP Per Porsi</h3>
-                <div class="space-y-2">
-                    <template x-for="(item, index) in daftarBahan" :key="index">
-                        <div class="flex justify-between items-center bg-amber-50 p-2 rounded text-xs">
-                            <div>
-                                <span class="font-semibold block" x-text="item.nama"></span>
-                                <span class="text-gray-500" x-text="'Beli: Rp ' + item.hargaBeli.toLocaleString() + ' (Hasil ' + item.jmlPorsi + ' porsi)'"></span>
-                            </div>
-                            <div class="text-right">
-                                <span class="font-bold text-amber-700 block" x-text="'Rp ' + Math.round(item.harga
+        <!-- Laporan -->
+        <div x-show="tab === 'laporan'" class="bg-white p-4 rounded-xl shadow-sm">
+            <h2 class="text-lg font-bold text-amber-900 mb-2">Laporan Penjualan</h2>
+            <p class="text-sm text-gray-600">Rekap omset harian dan bulanan usaha.</p>
+        </div>
+    </main>
+</body>
+</html>
