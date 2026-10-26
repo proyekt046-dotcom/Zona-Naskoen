@@ -7,49 +7,181 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-amber-50 text-slate-800" x-data="{ tab: 'pos' }">
+<body class="bg-amber-50 text-slate-800" x-data="zonaApp()">
     <!-- Header -->
-    <header class="bg-amber-600 text-white shadow-md">
+    <header class="bg-amber-600 text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <h1 class="text-lg font-bold flex items-center gap-2">
+            <h1 class="text-base font-bold flex items-center gap-2">
                 🟡 Zona Naskoen Pro
             </h1>
             <span class="bg-amber-700 text-xs px-2.5 py-1 rounded-full font-medium">Online & Siap Jualan</span>
         </div>
         <!-- Navigasi Tab -->
-        <nav class="bg-amber-700 px-4 flex gap-4 overflow-x-auto text-sm">
-            <button @click="tab = 'hpp'" :class="tab === 'hpp' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">HPP & Resep</button>
-            <button @click="tab = 'pos'" :class="tab === 'pos' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">Kasir (POS)</button>
-            <button @click="tab = 'stok'" :class="tab === 'stok' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">Stok</button>
-            <button @click="tab = 'laporan'" :class="tab === 'laporan' ? 'border-b-2 border-white font-bold' : 'opacity-80'" class="py-2.5 px-2 transition">Laporan</button>
+        <nav class="bg-amber-700 px-2 flex gap-2 overflow-x-auto text-sm">
+            <button @click="tab = 'pos'" :class="tab === 'pos' ? 'border-b-2 border-white font-bold bg-amber-800/50' : 'opacity-80'" class="py-2.5 px-3 transition rounded-t">Kasir (POS)</button>
+            <button @click="tab = 'hpp'" :class="tab === 'hpp' ? 'border-b-2 border-white font-bold bg-amber-800/50' : 'opacity-80'" class="py-2.5 px-3 transition rounded-t">HPP & Resep</button>
+            <button @click="tab = 'stok'" :class="tab === 'stok' ? 'border-b-2 border-white font-bold bg-amber-800/50' : 'opacity-80'" class="py-2.5 px-3 transition rounded-t">Stok</button>
+            <button @click="tab = 'laporan'" :class="tab === 'laporan' ? 'border-b-2 border-white font-bold bg-amber-800/50' : 'opacity-80'" class="py-2.5 px-3 transition rounded-t">Laporan</button>
         </nav>
     </header>
 
     <!-- Konten Utama -->
-    <main class="max-w-7xl mx-auto p-4">
-        <!-- HPP & Resep -->
-        <div x-show="tab === 'hpp'" class="bg-white p-4 rounded-xl shadow-sm">
-            <h2 class="text-lg font-bold text-amber-900 mb-2">Kalkulator HPP Nasi Kuning</h2>
-            <p class="text-sm text-gray-600">Hitung modal bahan baku dan rekomendasi harga jual porsi Nasi Kuning Lauk Royal.</p>
+    <main class="max-w-7xl mx-auto p-3 pb-20">
+        
+        <!-- 1. KASIR (POS) -->
+        <div x-show="tab === 'pos'" class="space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h2 class="text-md font-bold text-amber-900 mb-3">Pilih Menu Jualan</h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <template x-for="item in menuItems">
+                        <div @click="addToCart(item)" class="bg-amber-50 border border-amber-200 p-3 rounded-lg active:scale-95 transition cursor-pointer flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-800" x-text="item.name"></h3>
+                                <p class="text-xs text-amber-700 font-semibold mt-1" x-text="'Rp ' + item.price.toLocaleString()"></p>
+                            </div>
+                            <span class="text-[10px] bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded w-max mt-2">+ Tambah</span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Keranjang Belanja -->
+            <div class="bg-white p-4 rounded-xl shadow-sm">
+                <h2 class="text-md font-bold text-amber-900 mb-3">Pesanan Aktif</h2>
+                <template x-if="cart.length === 0">
+                    <p class="text-xs text-gray-500 italic py-2">Belum ada menu yang dipilih.</p>
+                </template>
+                <div class="space-y-2">
+                    <template x-for="(cartItem, index) in cart">
+                        <div class="flex justify-between items-center border-b pb-2 text-sm">
+                            <div>
+                                <p class="font-medium" x-text="cartItem.name"></p>
+                                <p class="text-xs text-gray-500" x-text="'Rp ' + cartItem.price.toLocaleString()"></p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button @click="updateQty(index, -1)" class="bg-gray-200 px-2 py-0.5 rounded text-xs font-bold">-</button>
+                                <span class="text-xs font-bold" x-text="cartItem.qty"></span>
+                                <button @click="updateQty(index, 1)" class="bg-amber-600 text-white px-2 py-0.5 rounded text-xs font-bold">+</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <div class="mt-4 pt-3 border-t flex justify-between items-center font-bold">
+                    <span>Total Pembayaran:</span>
+                    <span class="text-amber-700 text-lg" x-text="'Rp ' + totalCart.toLocaleString()"></span>
+                </div>
+                <button @click="checkout()" class="w-full mt-3 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-bold text-sm transition">
+                    Selesaikan Pesanan (Bayar)
+                </button>
+            </div>
         </div>
 
-        <!-- Kasir POS -->
-        <div x-show="tab === 'pos'" class="bg-white p-4 rounded-xl shadow-sm">
-            <h2 class="text-lg font-bold text-amber-900 mb-2">Kasir (POS) - Zona Naskoen</h2>
-            <p class="text-sm text-gray-600">Catat pesanan pelanggan dengan cepat untuk dine-in atau online delivery.</p>
+        <!-- 2. HPP & RESEP -->
+        <div x-show="tab === 'hpp'" class="bg-white p-4 rounded-xl shadow-sm space-y-3">
+            <h2 class="text-md font-bold text-amber-900">Kalkulator Modal HPP</h2>
+            <p class="text-xs text-gray-600">Hitung otomatis modal per porsi Nasi Kuning Lauk Royal.</p>
+            <div class="space-y-2 text-sm">
+                <div>
+                    <label class="block text-xs font-medium text-gray-700">Total Modal Bahan (Beras, Ayam, Telur, Bumbu, dll)</label>
+                    <input type="number" x-model.number="totalModal" class="w-full mt-1 p-2 border rounded-lg text-sm bg-amber-50/50">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-700">Hasil Jadi (Jumlah Porsi)</label>
+                    <input type="number" x-model.number="jumlahPorsi" class="w-full mt-1 p-2 border rounded-lg text-sm bg-amber-50/50">
+                </div>
+                <div class="bg-amber-100 p-3 rounded-lg mt-3">
+                    <p class="text-xs text-amber-900">HPP per Porsi:</p>
+                    <p class="text-lg font-bold text-amber-900" x-text="'Rp ' + Math.round(totalModal / (jumlahPorsi || 1)).toLocaleString()"></p>
+                </div>
+            </div>
         </div>
 
-        <!-- Stok -->
-        <div x-show="tab === 'stok'" class="bg-white p-4 rounded-xl shadow-sm">
-            <h2 class="text-lg font-bold text-amber-900 mb-2">Manajemen Stok Bahan</h2>
-            <p class="text-sm text-gray-600">Pantau ketersediaan beras kuning, ayam, telur, dan bumbu.</p>
+        <!-- 3. STOK BAHAN -->
+        <div x-show="tab === 'stok'" class="bg-white p-4 rounded-xl shadow-sm space-y-3">
+            <h2 class="text-md font-bold text-amber-900">Manajemen Stok Bahan Baku</h2>
+            <div class="space-y-2">
+                <template x-for="item in stocks">
+                    <div class="flex justify-between items-center border-b pb-2 text-sm">
+                        <div>
+                            <p class="font-medium" x-text="item.name"></p>
+                            <p class="text-xs text-gray-500" x-text="'Tersedia: ' + item.qty + ' ' + item.unit"></p>
+                        </div>
+                        <span class="px-2 py-1 text-xs rounded font-semibold" :class="item.qty > 5 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'" x-text="item.qty > 5 ? 'Aman' : 'Menipis'"></span>
+                    </div>
+                </template>
+            </div>
         </div>
 
-        <!-- Laporan -->
-        <div x-show="tab === 'laporan'" class="bg-white p-4 rounded-xl shadow-sm">
-            <h2 class="text-lg font-bold text-amber-900 mb-2">Laporan Penjualan</h2>
-            <p class="text-sm text-gray-600">Rekap omset harian dan bulanan usaha.</p>
+        <!-- 4. LAPORAN -->
+        <div x-show="tab === 'laporan'" class="bg-white p-4 rounded-xl shadow-sm space-y-3">
+            <h2 class="text-md font-bold text-amber-900">Laporan Penjualan Hari Ini</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                    <p class="text-xs text-gray-600">Total Omset</p>
+                    <p class="text-base font-bold text-amber-900" x-text="'Rp ' + totalOmset.toLocaleString()"></p>
+                </div>
+                <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                    <p class="text-xs text-gray-600">Transaksi Sukses</p>
+                    <p class="text-base font-bold text-amber-900" x-text="totalTransaksi + ' Pesanan'"></p>
+                </div>
+            </div>
         </div>
+
     </main>
+
+    <script>
+        function zonaApp() {
+            return {
+                tab: 'pos',
+                menuItems: [
+                    { id: 1, name: 'Nasi Kuning Royal', price: 25000 },
+                    { id: 2, name: 'Nasi Kuning Regular', price: 15000 },
+                    { id: 3, name: 'Ayam Goreng Tambahan', price: 8000 },
+                    { id: 4, name: 'Telur Balado / Rendang', price: 5000 },
+                    { id: 5, name: 'Cakalang Suir Balado', price: 7000 },
+                    { id: 6, name: 'Es Teh Manis', price: 5000 }
+                ],
+                cart: [],
+                totalModal: 150000,
+                jumlahPorsi: 20,
+                stocks: [
+                    { name: 'Beras Kuning', qty: 15, unit: 'Kg' },
+                    { name: 'Ayam Potong', qty: 4, unit: 'Kg' },
+                    { name: 'Telur Ayam', qty: 2, unit: 'Tray' },
+                    { name: 'Santan Kelapa', qty: 6, unit: 'Liter' },
+                    { name: 'Minyak Goreng', qty: 8, unit: 'Liter' }
+                ],
+                totalOmset: 0,
+                totalTransaksi: 0,
+                addToCart(item) {
+                    let existing = this.cart.find(i => i.id === item.id);
+                    if (existing) {
+                        existing.qty++;
+                    } else {
+                        this.cart.push({ ...item, qty: 1 });
+                    }
+                },
+                updateQty(index, change) {
+                    this.cart[index].qty += change;
+                    if (this.cart[index].qty <= 0) {
+                        this.cart.splice(index, 1);
+                    }
+                },
+                get totalCart() {
+                    return this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                },
+                checkout() {
+                    if (this.cart.length === 0) {
+                        alert('Keranjang masih kosong!');
+                        return;
+                    }
+                    this.totalOmset += this.totalCart;
+                    this.totalTransaksi++;
+                    alert('Pesanan berhasil disimpan & dicatat ke laporan!');
+                    this.cart = [];
+                }
+            }
+        }
+    </script>
 </body>
 </html>
